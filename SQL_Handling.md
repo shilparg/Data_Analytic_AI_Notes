@@ -109,15 +109,15 @@ Recursive CTEs allow querying hierarchical or tree-structured data.
 Example: Retrieve all subordinates of a manager
 
 WITH RECURSIVE subordinates AS (
-SELECT employee_id, manager_id, name
-FROM employees
-WHERE manager_id IS NULL -- top-level manager
-UNION ALL
-SELECT e.employee_id, e.manager_id, e.name
-FROM employees e
-INNER JOIN subordinates s ON e.manager_id = s.employee_id
-)
-SELECT \* FROM subordinates;
+  SELECT employee_id, manager_id, name 
+  FROM employees 
+  WHERE manager_id IS NULL -- top-level manager
+  UNION ALL 
+  SELECT e.employee_id, e.manager_id, e.name 
+  FROM employees e 
+  INNER JOIN subordinates s ON e.manager_id = s.employee_id
+) 
+SELECT * FROM subordinates;
 
 7.3 Using CASE Statements for Conditional Logic
 
