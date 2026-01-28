@@ -7,14 +7,14 @@ CTEs allow you to build intermediate result sets that can be reused in the main 
 Example: Find clients whose total claims exceed 50% of their income
 
 WITH claim_totals AS (
-  SELECT client_id, SUM(claim_amt) AS total_claims
-  FROM claim
-  GROUP BY client_id
+SELECT client_id, SUM(claim_amt) AS total_claims
+FROM claim
+GROUP BY client_id
 )
 SELECT cl.id, cl.first_name, cl.last_name, cl.income, ct.total_claims
 FROM client cl
 JOIN claim_totals ct ON cl.id = ct.client_id
-WHERE ct.total_claims > 0.5 * cl.income;
+WHERE ct.total_claims > 0.5 \* cl.income;
 
 2. Window Functions with QUALIFY
 
@@ -23,7 +23,7 @@ Window functions let you rank or order rows within partitions. QUALIFY filters b
 Example: Highest claim per car
 
 SELECT id, car_id, claim_amt,
-       RANK() OVER (PARTITION BY car_id ORDER BY claim_amt DESC) AS rank
+RANK() OVER (PARTITION BY car_id ORDER BY claim_amt DESC) AS rank
 FROM claim
 QUALIFY rank = 1;
 
@@ -76,7 +76,7 @@ Example: Identify heavy hitters (claims much larger than average)
 
 SELECT car_id, claim_amt
 FROM claim
-WHERE claim_amt > 10 * (SELECT AVG(claim_amt) FROM claim);
+WHERE claim_amt > 10 \* (SELECT AVG(claim_amt) FROM claim);
 
 Interpretation: A claim 10× higher than average indicates tail risk and potential catastrophic exposure.
 
@@ -99,7 +99,7 @@ Window functions can calculate running totals, moving averages, and other cumula
 Example: Running total of claims per client
 
 SELECT client_id, claim_date, claim_amt,
-       SUM(claim_amt) OVER (PARTITION BY client_id ORDER BY claim_date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total
+SUM(claim_amt) OVER (PARTITION BY client_id ORDER BY claim_date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total
 FROM claim;
 
 7.2 Recursive Queries
@@ -109,15 +109,15 @@ Recursive CTEs allow querying hierarchical or tree-structured data.
 Example: Retrieve all subordinates of a manager
 
 WITH RECURSIVE subordinates AS (
-  SELECT employee_id, manager_id, name
-  FROM employees
-  WHERE manager_id IS NULL -- top-level manager
-  UNION ALL
-  SELECT e.employee_id, e.manager_id, e.name
-  FROM employees e
-  INNER JOIN subordinates s ON e.manager_id = s.employee_id
+SELECT employee_id, manager_id, name
+FROM employees
+WHERE manager_id IS NULL -- top-level manager
+UNION ALL
+SELECT e.employee_id, e.manager_id, e.name
+FROM employees e
+INNER JOIN subordinates s ON e.manager_id = s.employee_id
 )
-SELECT * FROM subordinates;
+SELECT \* FROM subordinates;
 
 7.3 Using CASE Statements for Conditional Logic
 
@@ -126,18 +126,18 @@ CASE statements enable conditional transformations within queries.
 Example: Categorize claims by amount
 
 SELECT claim_id, claim_amt,
-       CASE
-         WHEN claim_amt < 1000 THEN 'Low'
-         WHEN claim_amt BETWEEN 1000 AND 5000 THEN 'Medium'
-         ELSE 'High'
-       END AS claim_category
+CASE
+WHEN claim_amt < 1000 THEN 'Low'
+WHEN claim_amt BETWEEN 1000 AND 5000 THEN 'Medium'
+ELSE 'High'
+END AS claim_category
 FROM claim;
 
 7.4 Query Optimization Tips
 
 Use indexes on columns frequently used in WHERE, JOIN, and ORDER BY clauses.
 
-Avoid SELECT *; specify only needed columns.
+Avoid SELECT \*; specify only needed columns.
 
 Use EXPLAIN plans to analyze query performance.
 
@@ -153,9 +153,9 @@ Example: Stored procedure to update claim status
 
 CREATE PROCEDURE UpdateClaimStatus()
 BEGIN
-  UPDATE claim
-  SET status = 'Reviewed'
-  WHERE claim_date < CURRENT_DATE - INTERVAL '30' DAY;
+UPDATE claim
+SET status = 'Reviewed'
+WHERE claim_date < CURRENT_DATE - INTERVAL '30' DAY;
 END;
 
 7.6 Security Best Practices
@@ -172,7 +172,7 @@ Encrypt sensitive data at rest and in transit.
 
 Example: Detect claims with suspiciously high frequency per client
 
-SELECT client_id, COUNT(*) AS claim_count
+SELECT client*id, COUNT(*) AS claim*count
 FROM claim
 WHERE claim_date > CURRENT_DATE - INTERVAL '30' DAY
 GROUP BY client_id
@@ -182,7 +182,7 @@ HAVING COUNT(*) > 5;
 
 Example: Track claims by status over time
 
-SELECT claim_status, COUNT(*) AS count, DATE_TRUNC('month', claim_date) AS month
+SELECT claim_status, COUNT(\*) AS count, DATE_TRUNC('month', claim_date) AS month
 FROM claim
 GROUP BY claim_status, month
 ORDER BY month;
@@ -219,6 +219,6 @@ Cache results for frequently accessed reports.
 Example: Compare query execution times
 
 EXPLAIN ANALYZE
-SELECT * FROM claim WHERE claim_amt > 10000;
+SELECT \* FROM claim WHERE claim_amt > 10000;
 
 This page now includes a comprehensive set of SQL query handling techniques, best practices, domain-specific examples, and practical tips for performance, security, and integration.
